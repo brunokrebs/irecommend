@@ -9,6 +9,7 @@ const JAVASCRIPT_TAG = 'javascript';
 var T = null;
 
 function handlePost(url, title, tags, cb) {
+  console.log(`Do we tweet ${title}?`);
   let containsJavascriptTag = false;
   tags.forEach(function(element) {
     if (element.toLowerCase() === JAVASCRIPT_TAG) {
@@ -16,10 +17,18 @@ function handlePost(url, title, tags, cb) {
     }
   });
   if (containsJavascriptTag) {
+    console.log(`Yes, we do not tweet ${title}.`);
+    title = title.substring(0, 30);
     T.post('statuses/update', {
       status: `I just read a great javascript article: ${title} (${url})`
-    }, cb);
+    }, function(err) {
+      if (!err) {
+        console.log(`Just tweeted ${title}.`);
+      }
+      cb(err);
+    });
   } else {
+    console.log(`No, we do not tweet ${title}.`);
     cb(null);
   }
 }
@@ -37,6 +46,7 @@ function handleHTTPResponse(response, body, cb) {
 }
 
 module.exports = function(context, cb) {
+  console.log(`Let's begin.`);
   T = new Twit({
     consumer_key: context.secrets.consumerKey,
     consumer_secret: context.secrets.consumerSecret,
